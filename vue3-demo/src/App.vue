@@ -1,6 +1,6 @@
 <template>
   <!-- <button class="delete" @click="deleteEntity">删除实体</button> -->
-  <button @click="deleteEntity">删除红点</button>
+  <!-- <button @click="deleteEntity">删除红点</button> -->
   <div id="cesiumContainer">
 
   </div>
@@ -19,55 +19,30 @@ onMounted(() => {
     selectionIndicator: false,  //  关闭点击要素之后的高亮
   })
 
-  const point = viewer.entities.add({
-    id: 'point',
-    position: Cesium.Cartesian3.fromDegrees(121, 30),
-    point: {
-      pixelSize: 20,
-      color: Cesium.Color.RED,
-      outlineColor: Cesium.Color.WHITE,
-      outlineWidth: 2
+  let lon, lat, num = 0
+  const line = viewer.entities.add({
+    // callbackProperty 生成一个回调函数, 该回调函数会在每一帧都执行, 生成一个动态的实体
+    polyline: {
+      positions: new Cesium.CallbackProperty(() => {
+        num += 0.002
+        lon = 120 + num
+        lat = 30 + num
+        if (lon < 121) {
+          return Cesium.Cartesian3.fromDegreesArray([120, 30, lon, lat])
+        } else {
+          line.polyline.positions = new Cesium.Cartesian3.fromDegreesArray([
+            120, 30, 121, 31,
+          ]);
+        }
+      }, false),  //  false表示只执行一次, 必须要有
+      material: Cesium.Color.YELLOW,
+      width: 5
     }
   })
-
-  const point2 = viewer.entities.add({
-    id: 'point2',
-    position: Cesium.Cartesian3.fromDegrees(121.30, 30),
-    point: {
-      pixelSize: 20,
-      color: Cesium.Color.RED,
-      outlineColor: Cesium.Color.WHITE,
-      outlineWidth: 2
-    }
+  let position = Cesium.Cartesian3.fromDegrees(120, 30, 1000000)
+  viewer.camera.setView({
+    destination: position
   })
-
-  const point3 = viewer.entities.add({
-    id: 'point3',
-    position: Cesium.Cartesian3.fromDegrees(121.60, 30),
-    point: {
-      pixelSize: 20,
-      color: Cesium.Color.BLUE,
-      outlineColor: Cesium.Color.WHITE,
-      outlineWidth: 2
-    }
-  })
-
-  redList.push(point, point2)
-
-  viewer.zoomTo(point)
-
-  // 删除方法(三种方法)
-  deleteEntity.value = () => {
-    // viewer.entities.removeById('point')
-    // viewer.entities.remove(point)
-    // viewer.entities.removeAll()
-    // 遍历数组删除蓝点
-    redList.forEach(item => {
-      viewer.entities.remove(item)
-    })
-    // 清空数组
-    redList = []
-  }
 
 })
 </script>

@@ -10,7 +10,10 @@ import { onMounted } from 'vue'
 onMounted(() => {
   Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNThkODlmMy03NGZlLTQ1NDUtYTE4My0wZjVkMDI1ZTUzY2IiLCJpZCI6MTUyMDgxLCJpYXQiOjE2ODg2OTI1Nzd9.EpYO589GwERntjrAEa8W3KBo6NOeGgXnQ3_0Kg8EHpo'
   // viewer是所有API的开始
-  const viewer = new Cesium.Viewer('cesiumContainer', {})
+  const viewer = new Cesium.Viewer('cesiumContainer', {
+    infoBox: false,  //  关闭点击要素之后的弹框
+    selectionIndicator: false,  //  关闭点击要素之后的高亮
+  })
 
   // 实体 entity
   // 写法1

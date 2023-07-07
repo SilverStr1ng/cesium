@@ -20,61 +20,71 @@ onMounted(() => {
     shouldAnimate: true,  //  是否开启动画
   })
 
-  // const linestring1 = turf.lineString([[-24, 63], [-23, 60], [-25, 65], [-20, 69]]);
-  // console.log(linestring1)
-  // // 把geoJson对象转换成了实体entity
-  // const data = Cesium.GeoJsonDataSource.load(linestring1)
-  // data.then(res => {
-  //   viewer.entities.add(res.entities.values[0])
-  //   viewer.zoomTo(res.entities.values[0])
-  // })
+  // entity 基于 primitive 封装
+  // 完美的封装了primitive的所有属性, 调用方便
+  // primitive 更接近webgl底层, 可以直接操作顶点, 但是调用不方便
+  // 可以绘制更高级的图形, 比如点线面
+  // 1. Draw a translucent ellipse on the surface with a checkerboard pattern
+  // var instance = new Cesium.GeometryInstance({
+  //   geometry: new Cesium.EllipseGeometry({
+  //     center: Cesium.Cartesian3.fromDegrees(-100.0, 20.0),
+  //     semiMinorAxis: 500000.0,
+  //     semiMajorAxis: 1000000.0,
+  //     rotation: Cesium.Math.PI_OVER_FOUR,
+  //     vertexFormat: Cesium.VertexFormat.POSITION_AND_ST
+  //   }),
+  //   id: 'object returned when this instance is picked and to get/set per-instance attributes'
+  // });
 
+  // viewer.scene.primitives.add(new Cesium.Primitive({
+  //   geometryInstances: instance,
+  //   appearance: new Cesium.EllipsoidSurfaceAppearance({
+  //     // material: Cesium.Material.fromType('Grid')  //  样式
+  //     material: new Cesium.Material({
+  //       fabric: {
+  //         type: 'Color',
+  //         uniforms: {
+  //           color: new Cesium.Color(1.0, 0.0, 0.0, 0.5)
+  //         }
+  //       }
+  //     })
+  //   })
+  // }));
 
-  // const multiLine = turf.multiLineString([[[8, 8], [10, 10]], [[1, 1], [5, 5]]]);
-  // Cesium.GeoJsonDataSource.load(multiLine).then(res => {
-  //   data = res
-  //   viewer.dataSources.add(data);
-  //   viewer.zoomTo(data);
-  // })
+  // 2. Draw different instances each with a unique color
+  var rectangleInstance = new Cesium.GeometryInstance({
+    geometry: new Cesium.RectangleGeometry({
+      rectangle: Cesium.Rectangle.fromDegrees(-140.0, 30.0, -100.0, 40.0),
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
+    }),
+    id: 'rectangle',
+    attributes: {
+      color: new Cesium.ColorGeometryInstanceAttribute(0.0, 1.0, 1.0, 0.5)
+    }
+  });
+  // 创建一个多边形
+  // 具体为三角形, 紧邻矩形
+  var triangleInstance = new Cesium.GeometryInstance({
+    geometry: new Cesium.PolygonGeometry({
+      polygonHierarchy: new Cesium.PolygonHierarchy(
+        Cesium.Cartesian3.fromDegreesArray([
+          -100, 43,
+          -90, 35,
+          - 100, 27,
 
-  // deleteEntity.value = () => {
-  //   viewer.dataSources.remove(data)
-  // }
-
-  // 生成多边形
-  // const polygon = turf.polygon([[
-  //   [121, 30],
-  //   [121.5, 30],
-  //   [121.5, 30.5],
-  //   [121, 30.5],
-  //   [121, 30]
-  // ]]);
-  // Cesium.GeoJsonDataSource.load(polygon).then(res => {
-  //   data = res
-  //   viewer.dataSources.add(data);
-  //   viewer.zoomTo(data);
-  // })
-
-  // 加载topojson
-  // const topojson = Cesium.GeoJsonDataSource.load('../src/assets/usa.topojson')
-  // topojson.then(res => {
-  //   data = res
-  //   viewer.dataSources.add(data);
-  //   viewer.zoomTo(data);
-  // })
-
-  // 加载kml数据
-  // const promise = Cesium.KmlDataSource.load('/src/assets/gdp.kmz')
-  // console.log(promise)
-  // viewer.dataSources.add(promise)
-
-  data = Cesium.CzmlDataSource.load('../src/assets/vehicle.czml')
-  data.then(res => {
-    viewer.dataSources.add(res);
-    let entity = res.entities.getById("Vehicle")
-    viewer.trackedEntity = entity;  //trackedEntity 可以实现一直移动相机跟踪entity目标
-  })
-
+        ])
+      ),
+      vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT
+    }),
+    id: 'triangle',
+    attributes: {
+      color: new Cesium.ColorGeometryInstanceAttribute(0.0, 0.0, 1.0, 0.5)
+    }
+  });
+  viewer.scene.primitives.add(new Cesium.Primitive({
+    geometryInstances: [rectangleInstance, triangleInstance],
+    appearance: new Cesium.PerInstanceColorAppearance()
+  }));
 })
 </script>
 

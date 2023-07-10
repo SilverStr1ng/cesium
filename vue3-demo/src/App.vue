@@ -40,7 +40,7 @@ onMounted(() => {
 
   handler.setInputAction(() => {
     // 拾取模型
-    let pick = viewer.scene.pick(viewer.camera.getPickRay(event.position), viewer.scene);
+    let pick = viewer.scene.pick(event.endPosition);
     console.log(1)
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
 

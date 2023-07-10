@@ -43,7 +43,8 @@ onMounted(() => {
     polyline: {
       positions: [],
       width: 5,
-      material: Cesium.Color.RED
+      material: Cesium.Color.RED,
+      clampToGround: true  //  是否贴地
     }
   })
 

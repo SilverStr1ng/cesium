@@ -38,10 +38,17 @@ onMounted(() => {
   // 添加点击事件
   handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
 
-  handler.setInputAction(() => {
+  let lastPick;
+  handler.setInputAction((event) => {
     // 拾取模型
-    let pick = viewer.scene.pick(event.endPosition);
-    console.log(1)
+    const pick = viewer.scene.pick(event.endPosition);
+    if (pick) {
+      if (lastPick) {
+        lastPick.color = Cesium.Color.WHITE
+      }
+      pick.color = Cesium.Color.ORANGERED;
+      lastPick = pick;
+    }
   }, Cesium.ScreenSpaceEventType.MOUSE_MOVE)
 
 })
